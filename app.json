@@ -1,0 +1,29 @@
+{
+  "name": "yt-dlp-api",
+  "description": "A FastAPI service for downloading audio using yt-dlp with API key authentication",
+  "repository": "https://github.com/Suraj08832/ytdlp",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["python", "fastapi", "yt-dlp", "audio", "download"],
+  "env": {
+    "API_KEY": {
+      "description": "Secret API key for authentication",
+      "generator": "secret"
+    },
+    "DOWNLOAD_DIR": {
+      "description": "Directory to store downloaded files",
+      "value": "/tmp/downloads"
+    },
+    "AUDIO_FORMAT": {
+      "description": "Audio format for downloads",
+      "value": "mp3"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-python"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-ffmpeg-latest"
+    }
+  ]
+}

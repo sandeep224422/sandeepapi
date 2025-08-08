@@ -2379,3 +2379,122 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#contributing-to-yt-dlp) for instructions o
 
 # WIKI
 See the [Wiki](https://github.com/yt-dlp/yt-dlp/wiki) for more information
+
+# yt-dlp Audio API Service
+
+A FastAPI service that provides audio download functionality using yt-dlp with API key authentication.
+
+## 🚀 Quick Deploy to Heroku
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Suraj08832/ytdlp)
+
+## Features
+
+- 🔐 API key authentication
+- 🎵 Audio download from URLs or search queries
+- 📁 Automatic file organization
+- 🎧 Multiple audio formats (mp3, m4a, etc.)
+- 🌐 CORS enabled for web integration
+- ☁️ Ready for Heroku deployment
+
+## Quick Start
+
+### Local Development
+
+1. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Set Environment Variables**
+   ```bash
+   export API_KEY="your-secret-api-key-here"
+   export DOWNLOAD_DIR="./downloads"
+   export AUDIO_FORMAT="mp3"
+   ```
+
+3. **Start the API Server**
+   ```bash
+   python start_api.py
+   ```
+
+### Heroku Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+
+## API Usage
+
+### Health Check
+```http
+GET /health
+```
+
+### Download Audio
+```http
+POST /download
+X-API-Key: your-secret-api-key-here
+Content-Type: application/json
+
+{
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "audio_format": "mp3"
+}
+```
+
+Or search by query:
+```http
+POST /download
+X-API-Key: your-secret-api-key-here
+Content-Type: application/json
+
+{
+  "query": "never gonna give you up",
+  "audio_format": "mp3"
+}
+```
+
+## Integration Example
+
+```python
+import requests
+
+API_BASE_URL = "https://your-app-name.herokuapp.com"
+API_KEY = "your-secret-api-key-here"
+
+def download_song(query_or_url):
+    headers = {"X-API-Key": API_KEY}
+    
+    if query_or_url.startswith("http"):
+        payload = {"url": query_or_url}
+    else:
+        payload = {"query": query_or_url}
+    
+    response = requests.post(
+        f"{API_BASE_URL}/download",
+        headers=headers,
+        json=payload
+    )
+    
+    if response.status_code == 200:
+        data = response.json()
+        return {
+            "title": data["title"],
+            "file_path": data["file_path"],
+            "file_url": f"{API_BASE_URL}{data['file_url']}" if data["file_url"] else None
+        }
+    else:
+        raise Exception(f"Download failed: {response.text}")
+```
+
+## Documentation
+
+- [API Documentation](README_API.md) - Detailed API usage
+- [Deployment Guide](DEPLOYMENT.md) - Heroku deployment instructions
+
+## Requirements
+
+- Python 3.8+
+- ffmpeg (for audio conversion)
+- yt-dlp
+- FastAPI
+- uvicorn
