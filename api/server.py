@@ -30,13 +30,12 @@ def require_api_key(x_api_key: Optional[str] = Header(default=None)) -> None:
     if not x_api_key or x_api_key != settings.api_key:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
-
-if settings.download_dir.exists():
-    app.mount(
-        "/files",
-        StaticFiles(directory=str(settings.download_dir)),
-        name="files",
-    )
+# Always mount /files; directory may be created later
+app.mount(
+    "/files",
+    StaticFiles(directory=str(settings.download_dir), check_dir=False),
+    name="files",
+)
 
 
 @app.get("/")
@@ -76,14 +75,13 @@ def start_download(
         audio_format=audio_format,
     )
 
-    # Build a file URL if static is mounted
+    # Build a file URL for convenience
     file_url: Optional[str] = None
-    if settings.download_dir.exists():
-        try:
-            relative_name = Path(result.output_file.name)
-            file_url = f"/files/{relative_name.as_posix()}"
-        except Exception:
-            file_url = None
+    try:
+        relative_name = Path(result.output_file.name)
+        file_url = f"/files/{relative_name.as_posix()}"
+    except Exception:
+        file_url = None
 
     return JSONResponse(
         {
@@ -106,4 +104,5 @@ def download_file(path: str, _: None = Depends(require_api_key)) -> Response:
 
     media_type, _ = mimetypes.guess_type(str(file_path))
     return FileResponse(path=str(file_path), media_type=media_type or "application/octet-stream")
+
 
