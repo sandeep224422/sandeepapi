@@ -39,6 +39,15 @@ if settings.download_dir.exists():
     )
 
 
+@app.get("/")
+def root() -> Dict[str, Any]:
+    return {
+        "service": "yt-dlp Audio API",
+        "status": "ok",
+        "endpoints": {"health": "/health", "download": "/download", "docs": "/docs"},
+    }
+
+
 @app.get("/health")
 def health() -> Dict[str, Any]:
     return {
@@ -97,5 +106,4 @@ def download_file(path: str, _: None = Depends(require_api_key)) -> Response:
 
     media_type, _ = mimetypes.guess_type(str(file_path))
     return FileResponse(path=str(file_path), media_type=media_type or "application/octet-stream")
-
 
